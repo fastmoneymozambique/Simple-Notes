@@ -22,39 +22,6 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     compileSdk = project.libs.versions.app.build.compileSDKVersion.get().toInt()
-import java.io.FileInputStream
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.konan.properties.Properties
-
-plugins {
-    alias(libs.plugins.android)
-    alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.kotlinSerialization)
-import java.io.FileInputStream
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.konan.properties.Properties
-
-plugins {
-    alias(libs.plugins.android)
-    alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.kotlinSerialization)
-    base
-}
-
-base {
-    archivesName.set("notes")
-}
-
-val keystorePropertiesFile: File = rootProject.file("keystore.properties")
-val keystoreProperties = Properties()
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-}
-
-android {
-    compileSdk = project.libs.versions.app.build.compileSDKVersion.get().toInt()
 
     defaultConfig {
         applicationId = libs.versions.app.version.appId.get()
@@ -63,7 +30,6 @@ android {
         versionName = libs.versions.app.version.versionName.get()
         versionCode = libs.versions.app.version.versionCode.get().toInt()
 
-        // KSP args, útil pro Room
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
@@ -106,6 +72,39 @@ android {
         register("core")
         register("fdroid")
         register("prepaid")
+    }
+
+    sourceSets {
+        getByName("main").java.srcDirs("src/main/kotlin")
+    }
+
+    compileOptions {
+        val javaVersion = JavaVersion.valueOf(libs.versions.app.build.javaVersion.get().toString())
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = libs.versions.app.build.kotlinJVMTarget.get()
+    }
+
+    namespace = libs.versions.app.version.appId.get()
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+}
+
+dependencies {
+    implementation(libs.simple.tools.commons)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.documentfile)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.bundles.room)
+    ksp(libs.androidx.room.compiler)
+}        register("prepaid")
     }
 
     sourceSets {
