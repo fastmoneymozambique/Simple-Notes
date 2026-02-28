@@ -22,13 +22,48 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     compileSdk = project.libs.versions.app.build.compileSDKVersion.get().toInt()
+import java.io.FileInputStream
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.konan.properties.Properties
+
+plugins {
+    alias(libs.plugins.android)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlinSerialization)
+import java.io.FileInputStream
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.konan.properties.Properties
+
+plugins {
+    alias(libs.plugins.android)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlinSerialization)
+    base
+}
+
+base {
+    archivesName.set("notes")
+}
+
+val keystorePropertiesFile: File = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    compileSdk = project.libs.versions.app.build.compileSDKVersion.get().toInt()
 
     defaultConfig {
         applicationId = libs.versions.app.version.appId.get()
         minSdk = project.libs.versions.app.build.minimumSDK.get().toInt()
         targetSdk = project.libs.versions.app.build.targetSDK.get().toInt()
-        versionName = project.libs.versions.app.version.versionName.get()
-        versionCode = project.libs.versions.app.version.versionCode.get().toInt()
+        versionName = libs.versions.app.version.versionName.get()
+        versionCode = libs.versions.app.version.versionCode.get().toInt()
+
+        // KSP args, útil pro Room
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
@@ -78,9 +113,9 @@ android {
     }
 
     compileOptions {
-        val currentJavaVersionFromLibs = JavaVersion.valueOf(libs.versions.app.build.javaVersion.get().toString())
-        sourceCompatibility = currentJavaVersionFromLibs
-        targetCompatibility = currentJavaVersionFromLibs
+        val javaVer = JavaVersion.valueOf(libs.versions.app.build.javaVersion.get().toString())
+        sourceCompatibility = javaVer
+        targetCompatibility = javaVer
     }
 
     tasks.withType<KotlinCompile> {
@@ -96,11 +131,20 @@ android {
 }
 
 dependencies {
-    implementation(libs.simple.tools.commons)
+    // Core Android
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.google.material)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.documentfile)
+
+    // Kotlin Serialization
     implementation(libs.kotlinx.serialization.json)
 
+    // Room
     implementation(libs.bundles.room)
     ksp(libs.androidx.room.compiler)
+
+    // Commons leve, do Maven Central
+    implementation(libs.simple.tools.commons)
 }
