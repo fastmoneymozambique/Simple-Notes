@@ -3,16 +3,11 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.serialization")
-    base
-}
-
-base {
-    archivesName.set("notes")
 }
 
 import java.io.FileInputStream
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.konan.properties.Properties
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
@@ -27,8 +22,9 @@ android {
         applicationId = "com.simplemobiletools.notes.pro"
         minSdk = 23
         targetSdk = 34
-        versionName = "6.17.0"
         versionCode = 114
+        versionName = "6.17.0"
+
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
@@ -78,9 +74,8 @@ android {
     }
 
     compileOptions {
-        val currentJavaVersionFromLibs = JavaVersion.VERSION_17
-        sourceCompatibility = currentJavaVersionFromLibs
-        targetCompatibility = currentJavaVersionFromLibs
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     tasks.withType<KotlinCompile> {
@@ -100,48 +95,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.documentfile:documentfile:1.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-    implementation("androidx.room:room-ktx:2.6.0-alpha02")
     implementation("androidx.room:room-runtime:2.6.0-alpha02")
+    implementation("androidx.room:room-ktx:2.6.0-alpha02")
     ksp("androidx.room:room-compiler:2.6.0-alpha02")
-}    }
-
-    sourceSets {
-        getByName("main").java.srcDirs("src/main/kotlin")
-    }
-
-    compileOptions {
-        val javaVer = JavaVersion.valueOf(libs.versions.app.build.javaVersion.get().toString())
-        sourceCompatibility = javaVer
-        targetCompatibility = javaVer
-    }
-
-    tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = project.libs.versions.app.build.kotlinJVMTarget.get()
-    }
-
-    namespace = libs.versions.app.version.appId.get()
-
-    lint {
-        checkReleaseBuilds = false
-        abortOnError = false
-    }
-}
-
-dependencies {
-    // Core Android
-    implementation(libs.androidx.core)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.google.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.documentfile)
-
-    // Kotlin Serialization
-    implementation(libs.kotlinx.serialization.json)
-
-    // Room
-    implementation(libs.bundles.room)
-    ksp(libs.androidx.room.compiler)
-
-    // Commons leve, do Maven Central
-    implementation(libs.simple.tools.commons)
 }
