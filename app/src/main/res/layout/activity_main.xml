@@ -38,4 +38,14 @@
 
         </com.simplemobiletools.commons.views.MyViewPager>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/test_message"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Deixe instalado por 14 dias – BY ACÁCIO FARIA"
+        android:textSize="18sp"
+        android:textColor="#FF0000"
+        android:background="#88FFFFFF"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
