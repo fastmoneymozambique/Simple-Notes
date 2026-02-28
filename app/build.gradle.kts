@@ -1,18 +1,18 @@
-import java.io.FileInputStream
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.konan.properties.Properties
-
 plugins {
-    alias(libs.plugins.android)
-    alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.kotlinSerialization)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.serialization")
     base
 }
 
 base {
     archivesName.set("notes")
 }
+
+import java.io.FileInputStream
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.konan.properties.Properties
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
@@ -21,15 +21,14 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdk = project.libs.versions.app.build.compileSDKVersion.get().toInt()
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = libs.versions.app.version.appId.get()
-        minSdk = project.libs.versions.app.build.minimumSDK.get().toInt()
-        targetSdk = project.libs.versions.app.build.targetSDK.get().toInt()
-        versionName = libs.versions.app.version.versionName.get()
-        versionCode = libs.versions.app.version.versionCode.get().toInt()
-
+        applicationId = "com.simplemobiletools.notes.pro"
+        minSdk = 23
+        targetSdk = 34
+        versionName = "6.17.0"
+        versionCode = 114
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
@@ -79,16 +78,16 @@ android {
     }
 
     compileOptions {
-        val javaVersion = JavaVersion.valueOf(libs.versions.app.build.javaVersion.get().toString())
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
+        val currentJavaVersionFromLibs = JavaVersion.VERSION_17
+        sourceCompatibility = currentJavaVersionFromLibs
+        targetCompatibility = currentJavaVersionFromLibs
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = libs.versions.app.build.kotlinJVMTarget.get()
+        kotlinOptions.jvmTarget = "17"
     }
 
-    namespace = libs.versions.app.version.appId.get()
+    namespace = "com.simplemobiletools.notes.pro"
 
     lint {
         checkReleaseBuilds = false
@@ -97,15 +96,14 @@ android {
 }
 
 dependencies {
-    implementation(libs.simple.tools.commons)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.documentfile)
-    implementation(libs.kotlinx.serialization.json)
-
-    implementation(libs.bundles.room)
-    ksp(libs.androidx.room.compiler)
-}        register("prepaid")
-    }
+    implementation("com.github.SimpleMobileTools:Simple-Commons:eceb48949e")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.documentfile:documentfile:1.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("androidx.room:room-ktx:2.6.0-alpha02")
+    implementation("androidx.room:room-runtime:2.6.0-alpha02")
+    ksp("androidx.room:room-compiler:2.6.0-alpha02")
+}    }
 
     sourceSets {
         getByName("main").java.srcDirs("src/main/kotlin")
